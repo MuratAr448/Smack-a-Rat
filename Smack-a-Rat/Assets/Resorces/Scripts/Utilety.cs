@@ -29,6 +29,7 @@ public class Utilety : MonoBehaviour
     }
     public void Quit()
     {
-        Application.Quit();
+        Debug.Log("Quit");
+        //Application.Quit();
     }
 }
