@@ -5,7 +5,7 @@ public class Rats : MonoBehaviour
 {
     protected GameManager gameManager;
     protected Button ownButton;
-    protected float timer = 0;
+    [SerializeField] protected float timer = 0;
     protected bool beenHit = false;
     protected bool effectOnce = false;
     protected virtual void Start()
@@ -18,7 +18,7 @@ public class Rats : MonoBehaviour
     {
         if (!beenHit)
         {
-            timer += Time.deltaTime;
+            timer += Time.deltaTime * gameManager.increaseActiveSpeed;
         }
         if(timer > gameManager.ratActiveSpeed&&!effectOnce)
         {

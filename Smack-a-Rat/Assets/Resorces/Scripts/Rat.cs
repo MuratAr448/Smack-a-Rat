@@ -7,12 +7,12 @@ public class Rat : Rats
     public override void RatHit()
     {
         base.RatHit();
-        //score +100
+        gameManager.Score += 100;
     }
     protected override void RatEffect()
     {
         base.RatEffect();
+        gameManager.LostLifeTime();
         gameManager.lives -= 1;
-        Destroy(gameObject, 0.1f);
     }
 }
