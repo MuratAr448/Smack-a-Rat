@@ -9,7 +9,7 @@ public class Utilety : MonoBehaviour
     private void Start()
     {
         string info = FindObjectOfType<InfoApi>().user_id;
-        if (info != null)
+        if (info != "")
         {
             ToStart();
         }else

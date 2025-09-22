@@ -980,7 +980,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1302402450}
-        m_TargetAssemblyTypeName: Utilety, Assembly-CSharp
+        m_TargetAssemblyTypeName: UtiletyGame, Assembly-CSharp
         m_MethodName: ToGame
         m_Mode: 1
         m_Arguments:
@@ -1923,6 +1923,8 @@ MonoBehaviour:
   LoseScreen: {fileID: 1363103172}
   TimeLine: {fileID: 260607404}
   TimePoint: {fileID: 5354182372491982680, guid: 51c536417708e4849b764478971511de, type: 3}
+  amountTotal: 0
+  amountHit: 0
 --- !u!4 &1302402449
 Transform:
   m_ObjectHideFlags: 0
@@ -1947,12 +1949,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 1302402447}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a82170dacae6814419a8632f047e5fc0, type: 3}
+  m_Script: {fileID: 11500000, guid: 4333382d55dd7a447a6901ae49595665, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  start: {fileID: 0}
-  leaderBoard: {fileID: 0}
-  startName: {fileID: 0}
 --- !u!1 &1325981116
 GameObject:
   m_ObjectHideFlags: 0
@@ -2014,7 +2013,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1363103173
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2159,7 +2158,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 1302402450}
-        m_TargetAssemblyTypeName: Utilety, Assembly-CSharp
+        m_TargetAssemblyTypeName: UtiletyGame, Assembly-CSharp
         m_MethodName: ToStartScreen
         m_Mode: 1
         m_Arguments:

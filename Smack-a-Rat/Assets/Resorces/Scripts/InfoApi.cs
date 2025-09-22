@@ -10,6 +10,9 @@ public class InfoApi : MonoBehaviour
     public int session_id;
     public int time_taken;
     public float accuracy;
+    public int score;
+    public List<int> ratKind;
+    public List<int> time_Taken;
     private void Awake()
     {
         if(Api == null)
@@ -21,20 +24,5 @@ public class InfoApi : MonoBehaviour
             Destroy(this.gameObject);
         }
         DontDestroyOnLoad(this);
-    }
-    [Serializable]
-    public class Score
-    {
-        public int score;
-        public List<Times_Hit> Times_Hit;
-    }
-    [Serializable]
-    public class Times_Hit
-    {
-        public bool Rat;
-        public bool bombRat;
-        public bool specialRat;
-        public int time_Taken;
-        public float got_Hit_Procent;
     }
 }

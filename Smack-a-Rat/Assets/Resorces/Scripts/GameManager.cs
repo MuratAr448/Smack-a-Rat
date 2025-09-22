@@ -4,9 +4,11 @@ using UnityEngine;
 using TMPro;
 using Unity.Mathematics;
 using System;
+using System.Drawing;
 
 public class GameManager : MonoBehaviour
 {
+    public static InfoApi _infoApi;
     public List<GameObject> Rats;
     public List<GameObject> Locations;
     public int lives = 3;
@@ -14,6 +16,7 @@ public class GameManager : MonoBehaviour
     public int Score = 0;
     [SerializeField] private TextMeshProUGUI scoreText;
     [SerializeField] private TextMeshProUGUI timeText;
+
     public float ratActiveSpeed = 35f;
     private float ratSpawnSpeed = 25f;
     private float increaseSpawnSpeed = 10.0f;
@@ -21,27 +24,23 @@ public class GameManager : MonoBehaviour
     private float timer = 0f;
     private float totalTime = 0f;
     private bool dead = false;
+
     private List<float> TimesLost = new List<float>();
     [SerializeField] private GameObject LoseScreen;
     [SerializeField] private GameObject TimeLine;
     [SerializeField] private GameObject TimePoint;
+
+    public int amountTotal;
+    public int amountHit;
     void Start()
     {
-        
+        _infoApi = FindObjectOfType<InfoApi>();
+
     }
     public void LostLifeTime(int ratId)
     {
-        switch (ratId)
-        {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            default:
-                break;
-        }
+        _infoApi.ratKind.Add(ratId);
+        _infoApi.time_Taken.Add((int)math.round(totalTime));
         TimesLost.Add(totalTime);
     }
     void Update()
@@ -64,6 +63,10 @@ public class GameManager : MonoBehaviour
             LoseScreen.SetActive(true);
             Defeat();
         }
+        if (Input.GetMouseButtonDown(0))
+        {
+            Acuracy();
+        }
     }
     private void Defeat()
     {
@@ -72,11 +75,27 @@ public class GameManager : MonoBehaviour
         //in Score put in score
         for (int i = 0; i < TimesLost.Count; i++)
         {
+
             float temp =  MathProcent(TimesLost[i], totalTime);
             Debug.Log("Time got hit: " + Math.Round(TimesLost[i]) + ", Procent: " + Math.Round(temp * 100, 1));
             //amount hit and when you get hit TimesLost[i] with what  and what procentage
             temp = 1000 - (1000 * temp) - 500;
             Instantiate(TimePoint, TimeLine.transform.position + Vector3.right * -temp, quaternion.identity, TimeLine.transform);
+        }
+        _infoApi.time_taken = (int)math.round(totalTime);
+        _infoApi.accuracy = MathProcent(amountHit, amountTotal);
+        _infoApi.score = Score;
+    }
+    private void Acuracy()
+    {
+        Ray ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            if (hit.collider.CompareTag("Rat"))
+            {
+                amountHit++;
+            }
+            amountTotal++;
         }
     }
     private float MathProcent(float point,float end)
