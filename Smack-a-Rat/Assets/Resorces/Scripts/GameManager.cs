@@ -29,8 +29,19 @@ public class GameManager : MonoBehaviour
     {
         
     }
-    public void LostLifeTime()
+    public void LostLifeTime(int ratId)
     {
+        switch (ratId)
+        {
+            case 0:
+                break;
+            case 1:
+                break;
+            case 2:
+                break;
+            default:
+                break;
+        }
         TimesLost.Add(totalTime);
     }
     void Update()
@@ -56,10 +67,14 @@ public class GameManager : MonoBehaviour
     }
     private void Defeat()
     {
+        //create session
+        //add totalTime
+        //in Score put in score
         for (int i = 0; i < TimesLost.Count; i++)
         {
             float temp =  MathProcent(TimesLost[i], totalTime);
             Debug.Log("Time got hit: " + Math.Round(TimesLost[i]) + ", Procent: " + Math.Round(temp * 100, 1));
+            //amount hit and when you get hit TimesLost[i] with what  and what procentage
             temp = 1000 - (1000 * temp) - 500;
             Instantiate(TimePoint, TimeLine.transform.position + Vector3.right * -temp, quaternion.identity, TimeLine.transform);
         }

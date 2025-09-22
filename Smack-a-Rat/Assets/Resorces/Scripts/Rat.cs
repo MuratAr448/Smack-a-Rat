@@ -12,7 +12,7 @@ public class Rat : Rats
     protected override void RatEffect()
     {
         base.RatEffect();
-        gameManager.LostLifeTime();
+        gameManager.LostLifeTime(0);
         gameManager.lives -= 1;
     }
 }

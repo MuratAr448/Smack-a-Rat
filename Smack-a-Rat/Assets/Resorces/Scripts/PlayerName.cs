@@ -8,13 +8,14 @@ using UnityEngine.Windows;
 
 public class PlayerName : MonoBehaviour
 {
-    [SerializeField] private TMP_Text Name;
+    [SerializeField] private TMPro.TMP_InputField Name;
+    [SerializeField] private CreateSessionApi CreateSessionApi;
     public bool alow = false;
     private void GrabName(string input)
     {
         if (input == "")
         {
-            alow = false;
+            alow = false;// get name api
         }
         else
         {
@@ -24,6 +25,7 @@ public class PlayerName : MonoBehaviour
     }
     public void GotNameCheck()
     {
-        GrabName(Name.text);
+        //GrabName(Name.text);
+        CreateSessionApi.CreateSession(Name.text);
     }
 }

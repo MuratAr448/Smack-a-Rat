@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 public class Utilety : MonoBehaviour
@@ -5,6 +6,17 @@ public class Utilety : MonoBehaviour
     public GameObject start;
     public GameObject leaderBoard;
     public GameObject startName;
+    private void Start()
+    {
+        string info = FindObjectOfType<InfoApi>().user_id;
+        if (info != null)
+        {
+            ToStart();
+        }else
+        {
+            ToStartName();
+        }
+    }
     public void ToStart()
     {
         start.SetActive(true);

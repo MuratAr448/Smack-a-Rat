@@ -3,35 +3,43 @@ using UnityEngine.Networking;
 using System;
 using System.Text;
 using System.Collections;
-using UnityEditor.Rendering;
 
-public class CreateSessionApi : MonoBehaviour
+public class SubmitScoreApi : MonoBehaviour
 {
     [Serializable]
-    private class CreateSessionRequest
+    private class SubmitScoreRequest
     {
-        public string username;
+        public long session_id;
+        public long level_id;
+        public int score;
+        public int time_taken;
+        public float accuracy;
     }
 
     [Serializable]
-    private class CreateSessionResponse
+    private class SubmitScoreResponse
     {
         public bool ok;
-        public int session_id;
+        public long score_id;
         public string error;
     }
 
-    private const string CreateSessionUrl = "http://localhost:5173/api/create-session";
-    public void CreateSession(string username)
+    private const string SubmitScoreUrl = "http://localhost:5173/api/submit-score";
+
+    public IEnumerator SubmitScore(long sessionId, long levelId, int score, int timeTaken, float accuracy)
     {
-        StartCoroutine(CreateSessionAsync(username));
-    }
-    public IEnumerator CreateSessionAsync(string username)
-    {
-        var reqObj = new CreateSessionRequest { username = username };
+        SubmitScoreRequest reqObj = new SubmitScoreRequest
+        {
+            session_id = sessionId,
+            level_id = levelId,
+            score = score,
+            time_taken = timeTaken,
+            accuracy = accuracy
+        };
+
         string json = JsonUtility.ToJson(reqObj);
 
-        var www = new UnityWebRequest(CreateSessionUrl, "POST");
+        UnityWebRequest www = new UnityWebRequest(SubmitScoreUrl, "POST");
         www.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
         www.downloadHandler = new DownloadHandlerBuffer();
         www.SetRequestHeader("Content-Type", "application/json");
@@ -44,13 +52,10 @@ public class CreateSessionApi : MonoBehaviour
             var text = www.downloadHandler.text;
             try
             {
-                CreateSessionResponse res = JsonUtility.FromJson<CreateSessionResponse>(text);
+                var res = JsonUtility.FromJson<SubmitScoreResponse>(text);
                 if (res != null && res.ok)
                 {
-                    Debug.Log($"Session created. session_id = {res.session_id}");
-                    FindObjectOfType<InfoApi>().user_id = username;
-                    FindObjectOfType<InfoApi>().session_id = res.session_id;
-                    FindObjectOfType<Utilety>().ToStart();
+                    Debug.Log($"Score saved. score_id = {res.score_id}");
                 }
                 else
                 {
@@ -68,4 +73,10 @@ public class CreateSessionApi : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        long sessionId = 3;
+        long levelId = 1;
+        StartCoroutine(SubmitScore(sessionId, levelId, 2552, 72, 64.2f));
+    }
 }
