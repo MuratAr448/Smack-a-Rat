@@ -6,7 +6,8 @@ using UnityEngine;
 public class InfoApi : MonoBehaviour 
 {
     public static InfoApi Api;
-    public string user_id;
+    public string userName;
+    public int user_id;
     public int session_id;
     public int time_taken;
     public float accuracy;

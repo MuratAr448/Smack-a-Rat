@@ -3,7 +3,6 @@ using UnityEngine.Networking;
 using System;
 using System.Text;
 using System.Collections;
-using UnityEditor.Rendering;
 
 public class CreateSessionApi : MonoBehaviour
 {
@@ -22,16 +21,16 @@ public class CreateSessionApi : MonoBehaviour
     }
 
     private const string CreateSessionUrl = "http://localhost:5173/api/create-session";
-    public void CreateSession(string username)
+    public void CreateSessionAsync()
     {
-        StartCoroutine(CreateSessionAsync(username));
+        StartCoroutine(CreateSession());
     }
-    public IEnumerator CreateSessionAsync(string username)
+    public IEnumerator CreateSession()
     {
-        var reqObj = new CreateSessionRequest { username = username };
+        CreateSessionRequest reqObj = new CreateSessionRequest { username = FindObjectOfType<InfoApi>().userName };
         string json = JsonUtility.ToJson(reqObj);
 
-        var www = new UnityWebRequest(CreateSessionUrl, "POST");
+        UnityWebRequest www = new UnityWebRequest(CreateSessionUrl, "POST");
         www.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
         www.downloadHandler = new DownloadHandlerBuffer();
         www.SetRequestHeader("Content-Type", "application/json");
@@ -41,16 +40,15 @@ public class CreateSessionApi : MonoBehaviour
 
         if (www.result == UnityWebRequest.Result.Success)
         {
-            var text = www.downloadHandler.text;
+            string text = www.downloadHandler.text;
             try
             {
                 CreateSessionResponse res = JsonUtility.FromJson<CreateSessionResponse>(text);
                 if (res != null && res.ok)
                 {
                     Debug.Log($"Session created. session_id = {res.session_id}");
-                    FindObjectOfType<InfoApi>().user_id = username;
                     FindObjectOfType<InfoApi>().session_id = res.session_id;
-                    FindObjectOfType<Utilety>().ToStart();
+                    FindObjectOfType<UtiletyGame>().ToGame();
                 }
                 else
                 {
@@ -64,8 +62,20 @@ public class CreateSessionApi : MonoBehaviour
         }
         else
         {
-            Debug.LogError($"HTTP error: {www.responseCode} - {www.error}");
+            Debug.LogError($"HTTP error: {www.responseCode} - {www.error} - {www.downloadHandler.text}");
+            try
+            {
+                string text = www.downloadHandler.text;
+                CreateSessionResponse res = JsonUtility.FromJson<CreateSessionResponse>(text);
+                if (res != null && !string.IsNullOrEmpty(res.error))
+                {
+                    Debug.LogError($"The server provided the following error message: {res.error}");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to parse JSON: {e.Message}");
+            }
         }
     }
-
 }

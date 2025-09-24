@@ -8,7 +8,7 @@ public class Utilety : MonoBehaviour
     public GameObject startName;
     private void Start()
     {
-        string info = FindObjectOfType<InfoApi>().user_id;
+        string info = FindObjectOfType<InfoApi>().userName;
         if (info != "")
         {
             ToStart();
@@ -34,18 +34,5 @@ public class Utilety : MonoBehaviour
         start.SetActive(false);
         startName.SetActive(true);
         leaderBoard.SetActive(false);
-    }
-    public void ToGame()
-    {
-        SceneManager.LoadScene("Game");
-    }
-    public void ToStartScreen()
-    {
-        SceneManager.LoadScene("StartScreen");
-    }
-    public void Quit()
-    {
-        Debug.Log("Quit");
-        //Application.Quit();
     }
 }

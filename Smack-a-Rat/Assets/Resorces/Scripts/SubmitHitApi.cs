@@ -1,44 +1,37 @@
-using TMPro;
 using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using Unity.VisualScripting;
-using UnityEngine.Windows;
-using System.Text;
-using System;
 using UnityEngine.Networking;
-
-public class PlayerName : MonoBehaviour
+using System;
+using System.Text;
+using System.Collections;
+using UnityEngine.SocialPlatforms.Impl;
+public class SubmitHitApi : MonoBehaviour
 {
-    [SerializeField] private TMPro.TMP_InputField Name;
-    public void GotNameCheck()
+    [Serializable]
+    private class SubmitHitRequest
     {
-        CheckNameAsync(Name.text);
-    }
-    public void CheckNameAsync(string username)
-    {
-        StartCoroutine(CheckName(username));
+        public int session_id;
+        public int rat;
+        public int whenHit;
     }
     [Serializable]
-    private class CheckUserRequest
-    {
-        public string username;
-    }
-    [Serializable]
-    private class CheckUserResponse
+    private class SubmitScoreResponse
     {
         public bool ok;
-        public int user_id;
         public string error;
     }
-    private const string CheckNameUrl = "http://localhost:5173/api/check-name";
-    public IEnumerator CheckName(string username)
+    private const string SubmitHitUrl = "http://localhost:5173/api/submit-hit";
+    public IEnumerator SubmitHit(int sessionId, int rat, int whenHit)
     {
-        CheckUserRequest reqObj = new CheckUserRequest { username = username };
+        SubmitHitRequest reqObj = new SubmitHitRequest
+        {
+            session_id = sessionId,
+            rat = rat,
+            whenHit = whenHit
+        };
+
         string json = JsonUtility.ToJson(reqObj);
 
-        UnityWebRequest www = new UnityWebRequest(CheckNameUrl, "POST");//split for only name
+        UnityWebRequest www = new UnityWebRequest(SubmitHitUrl, "POST");
         www.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
         www.downloadHandler = new DownloadHandlerBuffer();
         www.SetRequestHeader("Content-Type", "application/json");
@@ -51,13 +44,10 @@ public class PlayerName : MonoBehaviour
             string text = www.downloadHandler.text;
             try
             {
-                CheckUserResponse res = JsonUtility.FromJson<CheckUserResponse>(text);
+                SubmitScoreResponse res = JsonUtility.FromJson<SubmitScoreResponse>(text);
                 if (res != null && res.ok)
                 {
-                    Debug.Log($"user good. name = {res.user_id}");
-                    FindObjectOfType<InfoApi>().user_id = res.user_id;
-                    FindObjectOfType<InfoApi>().userName = username;
-                    FindObjectOfType<Utilety>().ToStart();
+                    Debug.Log($"Saved Hit!");
                 }
                 else
                 {
@@ -75,7 +65,7 @@ public class PlayerName : MonoBehaviour
             try
             {
                 string text = www.downloadHandler.text;
-                CheckUserResponse res = JsonUtility.FromJson<CheckUserResponse>(text);
+                SubmitScoreResponse res = JsonUtility.FromJson<SubmitScoreResponse>(text);
                 if (res != null && !string.IsNullOrEmpty(res.error))
                 {
                     Debug.LogError($"The server provided the following error message: {res.error}");

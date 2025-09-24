@@ -5,10 +5,13 @@ using TMPro;
 using Unity.Mathematics;
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices.WindowsRuntime;
 
 public class GameManager : MonoBehaviour
 {
     public static InfoApi _infoApi;
+    public SubmitScoreApi SubmitScoreApi;
+    public SubmitHitApi SubmitHitApi;
     public List<GameObject> Rats;
     public List<GameObject> Locations;
     public int lives = 3;
@@ -35,13 +38,32 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         _infoApi = FindObjectOfType<InfoApi>();
-
+        SubmitScoreApi = FindObjectOfType<SubmitScoreApi>();
+        SubmitHitApi = FindObjectOfType<SubmitHitApi>();
     }
     public void LostLifeTime(int ratId)
     {
         _infoApi.ratKind.Add(ratId);
         _infoApi.time_Taken.Add((int)math.round(totalTime));
         TimesLost.Add(totalTime);
+        StartCoroutine(SubmitHitApi.SubmitHit(_infoApi.session_id, _infoApi.ratKind[TimesLost.Count-1], _infoApi.time_Taken[TimesLost.Count - 1]));
+        string ratKind = "";
+        switch (ratId)
+        {
+            case 0:
+                ratKind = "Rat";
+                break;
+            case 1:
+                ratKind = "Special Rat";
+                break;
+            case 2:
+                ratKind = "Bomb Rat";
+                break;
+            default:
+                ratKind = "";
+                break;
+        }
+        Debug.Log("Rat: " + ratKind + ". And When: " + _infoApi.time_Taken[TimesLost.Count - 1]);
     }
     void Update()
     {
@@ -63,35 +85,34 @@ public class GameManager : MonoBehaviour
             LoseScreen.SetActive(true);
             Defeat();
         }
-        if (Input.GetMouseButtonDown(0))
+        if (!dead && Input.GetMouseButtonDown(0))
         {
             Acuracy();
         }
     }
     private void Defeat()
     {
-        //create session
-        //add totalTime
-        //in Score put in score
+        _infoApi.time_taken = (int)Math.Round(totalTime);
+        _infoApi.accuracy = (float)Math.Round(MathProcent(amountHit, amountTotal), 1);
+        _infoApi.score = Score;
         for (int i = 0; i < TimesLost.Count; i++)
         {
 
             float temp =  MathProcent(TimesLost[i], totalTime);
-            Debug.Log("Time got hit: " + Math.Round(TimesLost[i]) + ", Procent: " + Math.Round(temp * 100, 1));
             //amount hit and when you get hit TimesLost[i] with what  and what procentage
-            temp = 1000 - (1000 * temp) - 500;
-            Instantiate(TimePoint, TimeLine.transform.position + Vector3.right * -temp, quaternion.identity, TimeLine.transform);
+            temp = temp*10 - 500;
+            Instantiate(TimePoint, TimeLine.transform.position + Vector3.right * temp, quaternion.identity, TimeLine.transform);
+
         }
-        _infoApi.time_taken = (int)math.round(totalTime);
-        _infoApi.accuracy = MathProcent(amountHit, amountTotal);
-        _infoApi.score = Score;
+        Debug.Log("Score: "+_infoApi.score+". Total time: "+ _infoApi.time_taken+". Accuracy: "+ _infoApi.accuracy);
+        StartCoroutine(SubmitScoreApi.SubmitScore(_infoApi.session_id, _infoApi.score, _infoApi.time_taken, _infoApi.accuracy));
     }
     private void Acuracy()
     {
-        Ray ray = GetComponent<Camera>().ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        RaycastHit2D hit2D = Physics2D.Raycast(Input.mousePosition, Vector2.zero);
+        if (hit2D)
         {
-            if (hit.collider.CompareTag("Rat"))
+            if (hit2D.collider.CompareTag("Rat"))
             {
                 amountHit++;
             }
@@ -100,8 +121,8 @@ public class GameManager : MonoBehaviour
     }
     private float MathProcent(float point,float end)
     {
-        float temp = 100f / end * point / 100f;
-        return temp;
+        if (end <= 0.0001f || point <= 0.00001f) return 0.0f;
+        return point / end * 100f;
     }
     private void Diffeculty()
     {
