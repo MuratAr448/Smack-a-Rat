@@ -16,11 +16,11 @@ public class Rats : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (!beenHit)
+        if (!beenHit && gameManager.lives != 0)
         {
             timer += Time.deltaTime * gameManager.increaseActiveSpeed;
         }
-        if(timer > gameManager.ratActiveSpeed&&!effectOnce)
+        if (timer > gameManager.ratActiveSpeed && !effectOnce)
         {
             effectOnce = true;
             RatEffect();

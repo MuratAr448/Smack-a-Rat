@@ -43,27 +43,33 @@ public class GameManager : MonoBehaviour
     }
     public void LostLifeTime(int ratId)
     {
-        _infoApi.ratKind.Add(ratId);
-        _infoApi.time_Taken.Add((int)math.round(totalTime));
-        TimesLost.Add(totalTime);
-        StartCoroutine(SubmitHitApi.SubmitHit(_infoApi.session_id, _infoApi.ratKind[TimesLost.Count-1], _infoApi.time_Taken[TimesLost.Count - 1]));
-        string ratKind = "";
-        switch (ratId)
+        if (ratId>=3)
         {
-            case 0:
-                ratKind = "Rat";
-                break;
-            case 1:
-                ratKind = "Special Rat";
-                break;
-            case 2:
-                ratKind = "Bomb Rat";
-                break;
-            default:
-                ratKind = "";
-                break;
+
+        }else
+        {
+            _infoApi.ratKind.Add(ratId);
+            _infoApi.time_Taken.Add((int)math.round(totalTime));
+            TimesLost.Add(totalTime);
+            StartCoroutine(SubmitHitApi.SubmitHit(_infoApi.session_id, _infoApi.ratKind[TimesLost.Count - 1], _infoApi.time_Taken[TimesLost.Count - 1]));
+            string ratKind = "";
+            switch (ratId)
+            {
+                case 0:
+                    ratKind = "Rat";
+                    break;
+                case 1:
+                    ratKind = "Special Rat";
+                    break;
+                case 2:
+                    ratKind = "Bomb Rat";
+                    break;
+                default:
+                    ratKind = "";
+                    break;
+            }
+            Debug.Log("Rat: " + ratKind + ". And When: " + _infoApi.time_Taken[TimesLost.Count - 1]);
         }
-        Debug.Log("Rat: " + ratKind + ". And When: " + _infoApi.time_Taken[TimesLost.Count - 1]);
     }
     void Update()
     {
