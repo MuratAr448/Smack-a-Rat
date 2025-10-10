@@ -18,9 +18,8 @@ public class RankingApi : MonoBehaviour
     {
         getRankingApi = FindObjectOfType<GetRankingApi>();
         StartCoroutine(getRankingApi.GetRanking(RankNumber,this));
-        RankText();
     }
-    private void RankText()
+    public void RankText()
     {
         Ranking.text = RankNumber + ".";
         Name.text = "Name: " + Rankuser;

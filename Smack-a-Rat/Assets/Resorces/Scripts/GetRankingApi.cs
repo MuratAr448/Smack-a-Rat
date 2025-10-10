@@ -47,7 +47,7 @@ public class GetRankingApi : MonoBehaviour
                     ranking.Rankuser = res.user;
                     ranking.Rankscore = res.score;
                     ranking.Rankduration = res.duration;
-
+                    ranking.RankText();
                 }
                 else
                 {
