@@ -1,0 +1,80 @@
+using System;
+using System.Collections;
+using System.Text;
+using UnityEngine;
+using UnityEngine.Networking;
+
+public class GetCurrentRankingApi : MonoBehaviour
+{
+    [Serializable]
+    private class GetCurrentRankingRequest
+    {
+        public int userID;
+    }
+    [Serializable]
+    private class GetCurrentRankingResponse
+    {
+        public bool ok;
+        public string user;
+        public int score;
+        public int duration;
+        public string error;
+    }
+    private const string GetRankingUrl = "http://localhost:5173/api/get-current-ranking";
+
+    public IEnumerator GetCurrentRanking(int userID, RankingApi ranking)
+    {
+        GetCurrentRankingRequest reqObj = new GetCurrentRankingRequest { userID = userID };
+        string json = JsonUtility.ToJson(reqObj);
+
+        UnityWebRequest www = new UnityWebRequest(GetRankingUrl, "POST");//split for only name
+        www.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
+        www.downloadHandler = new DownloadHandlerBuffer();
+        www.SetRequestHeader("Content-Type", "application/json");
+        www.SetRequestHeader("Accept", "application/json");
+
+        yield return www.SendWebRequest();
+
+        if (www.result == UnityWebRequest.Result.Success)
+        {
+            string text = www.downloadHandler.text;
+            try
+            {
+                GetCurrentRankingResponse res = JsonUtility.FromJson<GetCurrentRankingResponse>(text);
+                if (res != null && res.ok)
+                {
+                    Debug.Log($"user good. name = {res.user}");
+                    ranking.Rankuser = res.user;
+                    ranking.Rankscore = res.score;
+                    ranking.Rankduration = res.duration;
+                    ranking.RankText();
+                }
+                else
+                {
+                    Debug.LogError($"Server did not return ok. Response: {text}");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to parse JSON: {e.Message}\nResponse: {text}");
+            }
+        }
+        else
+        {
+            Debug.LogError($"HTTP error: {www.responseCode} - {www.error}");
+            try
+            {
+                string text = www.downloadHandler.text;
+                GetCurrentRankingResponse res = JsonUtility.FromJson<GetCurrentRankingResponse>(text);
+                if (res != null && !string.IsNullOrEmpty(res.error))
+                {
+                    Debug.LogError($"The server provided the following error message: {res.error}");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to parse JSON: {e.Message}");
+            }
+        }
+    }
+}
